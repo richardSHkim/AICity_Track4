@@ -45,7 +45,7 @@ def main(model_path: str, data_yaml: str, save_json: Optional[str] = None):
     conf_indices = np.argmax(f1, axis=1)
     opt_conf_thresh_dict = {}
     for i in range(len(conf_indices)):
-        opt_conf_thresh_dict[coco_gt.dataset["categories"][int(i)]["id"]] = float(
+        opt_conf_thresh_dict[coco_gt.dataset["categories"][i]["id"]] = float(
             conf_ticks[conf_indices[i]]
         )
 
