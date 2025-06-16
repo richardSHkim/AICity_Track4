@@ -37,7 +37,7 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--report_to",
+        "--report-to",
         type=str,
         default="wandb",
     )
