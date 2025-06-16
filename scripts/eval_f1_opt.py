@@ -1,16 +1,11 @@
 from typing import Optional
-import os
 from pathlib import Path
 import argparse
 import json
 import numpy as np
 
-import sys
-
-sys.path.append(".")
-from pycocotools_custom.coco import COCO
-from pycocotools_custom.cocoeval_modified import COCOeval
-
+from ultralytics_custom.pycocotools_custom.coco import COCO
+from ultralytics_custom.pycocotools_custom.cocoeval_modified import COCOeval
 from ultralytics_custom.models.yolo.detect.val import CustomDetectionValidator
 
 
