@@ -1,11 +1,13 @@
 import argparse
-from functools import partial
 
-from ultralytics import YOLO
+from ultralytics import YOLO, SETTINGS
 from ultralytics_custom.models.yolo.detect import CustomDetectionTrainer
 
 
 def main(args):
+    if args.report_to == "wandb":
+        SETTINGS["wandb"] = True
+
     model = YOLO(args.init_weight)
     model.train(
         trainer=CustomDetectionTrainer,
@@ -31,6 +33,11 @@ if __name__ == "__main__":
         "--run-name",
         type=str,
         required=True,
+    )
+    parser.add_argument(
+        "--report_to",
+        type=str,
+        default="wandb",
     )
     # parser.add_argument(
     #     "--save-dir",
