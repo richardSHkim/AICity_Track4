@@ -1,0 +1,9 @@
+names:
+- Bus
+- Bike
+- Car
+- Pedestrian
+- Truck
+nc: 5
+train: ../datasets/FishEyeChallenge/FishEye8K/train/images
+val: ../datasets/FishEyeChallenge/FishEye8K/val/images

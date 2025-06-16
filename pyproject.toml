@@ -1,0 +1,11 @@
+[project]
+name = "aicity-track4"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pycocotools>=2.0.10",
+    "ultralytics==8.3.155",
+    "wandb>=0.20.1",
+]
