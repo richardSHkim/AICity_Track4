@@ -107,7 +107,10 @@ if __name__ == "__main__":
         "--model_path", type=str, required=True, help="Path to the model"
     )
     parser.add_argument(
-        "--score_threshold_json", type=str, default=None, help="Json file for class-wise score thresholding"
+        "--score_threshold_json",
+        type=str,
+        default=None,
+        help="Json file for class-wise score thresholding",
     )
     parser.add_argument(
         "--max_fps", type=float, default=25.0, help="Maximum FPS for evaluation"
@@ -120,4 +123,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args.image_folder, args.model_path, args.score_threshold_json, args.max_fps, args.save_pred_json)
+    main(
+        args.image_folder,
+        args.model_path,
+        args.score_threshold_json,
+        args.max_fps,
+        args.save_pred_json,
+    )
