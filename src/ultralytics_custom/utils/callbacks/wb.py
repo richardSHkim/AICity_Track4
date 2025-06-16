@@ -165,9 +165,7 @@ def on_pretrain_routine_start(trainer):
             project=str(trainer.args.project).replace("/", "-")
             if trainer.args.project
             else "Ultralytics",
-            name=str(trainer.args.name).replace("/", "-")
-            if trainer.args.wandb_name is None
-            else str(trainer.args.wandb_name).replace("/", "-"),
+            name=str(trainer.args.name).replace("/", "-"),
             config=vars(trainer.args),
         )
     # log class num
