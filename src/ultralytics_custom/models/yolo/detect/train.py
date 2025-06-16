@@ -1,7 +1,7 @@
 from ultralytics.utils import RANK
 from ultralytics.models.yolo.detect import DetectionTrainer
 
-from custom_ultralytics.utils.callbacks.base import replace_with_custom_callbacks
+from ultralytics_custom.utils.callbacks.base import replace_with_custom_callbacks
 
 
 class CustomDetectionTrainer(DetectionTrainer):

@@ -2,7 +2,7 @@ import argparse
 from functools import partial
 
 from ultralytics import YOLO
-from custom_ultralytics.models.yolo.detect import CustomDetectionTrainer
+from ultralytics_custom.models.yolo.detect import CustomDetectionTrainer
 
 
 def main(args):

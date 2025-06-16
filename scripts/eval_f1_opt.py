@@ -11,7 +11,7 @@ sys.path.append(".")
 from pycocotools_custom.coco import COCO
 from pycocotools_custom.cocoeval_modified import COCOeval
 
-from custom_ultralytics.models.yolo.detect.val import CustomDetectionValidator
+from ultralytics_custom.models.yolo.detect.val import CustomDetectionValidator
 
 
 def find_optimal_threshold(gt_json: str, pred_json: str):
