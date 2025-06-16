@@ -4,9 +4,12 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
 import os
 from pathlib import Path
-import torch
+import numpy as np
 from ultralytics.utils import SETTINGS, TESTS_RUNNING
-from ultralytics.utils.torch_utils import autocast, model_info_for_loggers
+from ultralytics.utils.torch_utils import model_info_for_loggers
+
+from ultralytics_custom.pycocotools_custom.coco import COCO
+from ultralytics_custom.pycocotools_custom.cocoeval_modified import COCOeval
 
 try:
     assert not TESTS_RUNNING  # do not log pytest
@@ -176,6 +179,7 @@ def on_pretrain_routine_start(trainer):
 # logging class wise metrics
 def on_fit_epoch_end(trainer):
     """Logs training metrics and model information at the end of an epoch."""
+    # class-wise score
     class_wise_metrics = {}
     for i, c in enumerate(trainer.validator.metrics.ap_class_index):
         class_wise_metrics[f"class_metrics_AP50/{trainer.validator.names[c]}"] = (
@@ -184,8 +188,61 @@ def on_fit_epoch_end(trainer):
         class_wise_metrics[f"class_metrics_AP50-95/{trainer.validator.names[c]}"] = (
             trainer.validator.metrics.class_result(i)[-1]
         )
+
+    # f1
+    # load json file
+    coco_gt = COCO(trainer.data["val_json"])
+    # update image id to filename
+    for img_dict in coco_gt.loadImgs(coco_gt.getImgIds()):
+        stem = Path(img_dict["file_name"]).stem
+        image_id = int(stem) if stem.isnumeric() else stem
+        for ann_dict in coco_gt.loadAnns(coco_gt.getAnnIds([img_dict["id"]])):
+            ann_dict["image_id"] = image_id
+        img_dict["id"] = image_id
+    coco_gt.createIndex()
+
+    # get optimal score treshold
+    f1_metrics = {}
+    conf_ticks = trainer.validator.metrics.curves_results[1][0]
+    f1 = trainer.validator.metrics.curves_results[1][1]
+    conf_indices = np.argmax(f1, axis=1)
+    opt_conf_thresh_dict = {}
+    for i, c in enumerate(trainer.validator.metrics.ap_class_index):
+        opt_conf_thresh_dict[coco_gt.dataset["categories"][i]["id"]] = float(
+            conf_ticks[conf_indices[i]]
+        )
+        f1_metrics[f"class_metrics_F1_50/{trainer.validator.names[c]}"] = float(
+            f1[i][conf_indices[i]]
+        )
+
+    # fileter predictions
+    predictions_coco = []
+    for pred in trainer.validator.jdict:
+        # fix category id
+        pred["category_id"] = coco_gt.dataset["categories"][pred["category_id"] - 1][
+            "id"
+        ]
+
+        # thresholding with score
+        if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
+            continue
+
+        predictions_coco.append(pred)
+    coco_dt = coco_gt.loadRes(predictions_coco)
+
+    # Initialize evaluation object
+    coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
+
+    # Run evaluation
+    coco_eval.evaluate()
+    coco_eval.accumulate()
+    coco_eval.summarize()
+    f1_metrics["metrics/F1_50-95"] = float(coco_eval.stats[20])
+    f1_metrics["metrics/F1_50"] = float(coco_eval.stats[21])
+
     metrics_to_log = {
         **class_wise_metrics,
+        **f1_metrics,
         **trainer.metrics,
     }
     wb.run.log(metrics_to_log, step=trainer.epoch + 1)

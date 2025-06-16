@@ -20,6 +20,7 @@ def main(args):
         imgsz=640,
         device=args.device,
         seed=args.seed,
+        save_json=True,
     )
 
 
