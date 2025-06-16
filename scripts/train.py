@@ -7,6 +7,8 @@ from ultralytics_custom.models.yolo.detect import CustomDetectionTrainer
 def main(args):
     if args.report_to == "wandb":
         SETTINGS["wandb"] = True
+    else:
+        SETTINGS["wandb"] = False
 
     model = YOLO(args.init_weight)
     model.train(
