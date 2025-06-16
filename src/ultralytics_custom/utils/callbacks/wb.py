@@ -176,8 +176,6 @@ def on_pretrain_routine_start(trainer):
 # logging class wise metrics
 def on_fit_epoch_end(trainer):
     """Logs training metrics and model information at the end of an epoch."""
-    if (trainer.epoch + 1) % trainer.args.val_period:
-        return
     class_wise_metrics = {}
     for i, c in enumerate(trainer.validator.metrics.ap_class_index):
         class_wise_metrics[f"class_metrics_AP50/{trainer.validator.names[c]}"] = (
