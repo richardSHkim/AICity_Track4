@@ -24,11 +24,16 @@ def get_image_Id(img_name):
 def main(
     image_folder: str,
     model_path: str,
+    score_threshold_json: str,
     max_fps: float = 25.0,
     save_pred_json: Optional[str] = None,
 ):
     # load model
     model = YOLO(model_path)
+    if score_threshold_json is not None:
+        score_threshold = json.load(open(score_threshold_json, "r"))
+    else:
+        score_threshold = None
 
     # gather image files
     image_files = sorted(
@@ -62,6 +67,8 @@ def main(
         scores = output[0].boxes.conf.cpu().numpy()
         labels = output[0].boxes.cls.cpu().numpy()
         for lab, box, s in zip(labels, boxes, scores):
+            if score_threshold is not None and float(s) < score_threshold[str(lab)]:
+                continue
             x1, y1, x2, y2 = [float(v) for v in box]
             results.append(
                 {
@@ -74,6 +81,7 @@ def main(
         t3 = time.time()
         total_time += t3 - t0
 
+    # fps
     fps = len(image_files) / total_time
     normfps = min(fps, max_fps) / max_fps
 
@@ -99,6 +107,9 @@ if __name__ == "__main__":
         "--model_path", type=str, required=True, help="Path to the model"
     )
     parser.add_argument(
+        "--score_threshold_json", type=str, default=None, help="Json file for class-wise score thresholding"
+    )
+    parser.add_argument(
         "--max_fps", type=float, default=25.0, help="Maximum FPS for evaluation"
     )
     parser.add_argument(
@@ -109,4 +120,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    main(args.image_folder, args.model_path, args.max_fps, args.save_pred_json)
+    main(args.image_folder, args.model_path, args.score_threshold_json, args.max_fps, args.save_pred_json)
