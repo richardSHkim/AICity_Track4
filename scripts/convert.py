@@ -17,7 +17,7 @@ def main(model_path: str, precision: str, data_yaml: str = None):
     if precision == "fp16":
         kwargs["half"] = True
     elif precision == "int8":
-        assert data_yaml is not None, f"data_yaml for calibration is missing"
+        assert data_yaml is not None, "data_yaml for calibration is missing"
         kwargs["int8"] = True
         kwargs["data"] = data_yaml
 

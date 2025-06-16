@@ -6,7 +6,6 @@ import cv2
 import json
 from tqdm import tqdm
 from pathlib import Path
-import numpy as np
 
 from ultralytics import YOLO
 
@@ -85,7 +84,7 @@ def main(
     fps = len(image_files) / total_time
     normfps = min(fps, max_fps) / max_fps
 
-    print(f"\n--- Evaluation Complete ---")
+    print("\n--- Evaluation Complete ---")
     print(f"Total processing time: {total_time:.2f} seconds")
     print(f"FPS: {fps:.2f}")
     print(f"Normalized FPS: {normfps:.4f}")

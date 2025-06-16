@@ -136,7 +136,7 @@ def _log_train_data_num(train_dir_list):
     train_data_num = 0
     for label_dir in label_dir_list:
         train_data_num += len(os.listdir(label_dir))
-    wb.run.log({f"train_data_num": train_data_num}, commit=False)
+    wb.run.log({"train_data_num": train_data_num}, commit=False)
 
 
 def _log_class_num(train_dir_list, categories):
