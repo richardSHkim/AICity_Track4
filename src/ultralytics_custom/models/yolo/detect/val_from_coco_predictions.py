@@ -95,8 +95,11 @@ class DetectionValidatorFromCOCOPrediction(DetectionValidator):
         coco = COCO(gt_json)
 
         # indexing
+        tmp_pred_data = json.load(open(pred_json, "r"))
+        if isinstance(tmp_pred_data, dict) and "annotations" in tmp_pred_data:
+            tmp_pred_data = tmp_pred_data["annotations"]
         pred_data = {}
-        for x in json.load(open(pred_json, "r")):
+        for x in tmp_pred_data:
             if x["image_id"] not in pred_data:
                 pred_data[x["image_id"]] = []
             pred_data[x["image_id"]].append(x)

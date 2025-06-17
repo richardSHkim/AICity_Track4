@@ -38,10 +38,12 @@ def main(
 ):
     coco_gt = COCO(gt_json)
     pred_data = json.load(open(pred_json, "r"))
+    if isinstance(pred_data, dict) and "annotations" in pred_data:
+        pred_data = pred_data["annotations"]
 
-    assert not (conf_thresh_json and conf_thresh), (
-        "can not use both option at the same time."
-    )
+    assert not (
+        conf_thresh_json and conf_thresh
+    ), "can not use both option at the same time."
 
     # find or load optimal threshold
     if conf_thresh is not None:
