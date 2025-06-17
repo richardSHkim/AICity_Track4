@@ -15,7 +15,7 @@ def main(init_model_path, data_yaml):
     )
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--init_model_path", type=str, required=True)
     parser.add_argument("--data_yaml", type=str, required=True)
