@@ -66,7 +66,7 @@ def main(
         scores = output[0].boxes.conf.cpu().numpy()
         labels = output[0].boxes.cls.cpu().numpy()
         for lab, box, s in zip(labels, boxes, scores):
-            if score_threshold is not None and float(s) < score_threshold[str(lab)]:
+            if score_threshold is not None and float(s) < score_threshold[str(int(lab))]:
                 continue
             x1, y1, x2, y2 = [float(v) for v in box]
             results.append(
