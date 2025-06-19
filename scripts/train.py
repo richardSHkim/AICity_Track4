@@ -16,7 +16,7 @@ def main(args):
         project=args.project_name,
         name=args.run_name,
         data=args.yaml_file,
-        epochs=args.epochs,
+        # epochs=args.epochs,
         imgsz=640,
         device=args.device,
         seed=args.seed,
