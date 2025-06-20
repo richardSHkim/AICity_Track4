@@ -290,9 +290,6 @@ def on_train_end(trainer):
                 y_title=y_title,
             )
 
-    # alert
-    wb.alert(title="Run finished", text="Run finished.")
-
     wb.run.finish()  # required or run continues on dashboard
 
 
