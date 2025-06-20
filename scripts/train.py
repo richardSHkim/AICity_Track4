@@ -84,11 +84,6 @@ if __name__ == "__main__":
         type=float,
         default=0.001111,
     )
-    parser.add_argument(
-        "--momentum",
-        type=float,
-        default=0.9,
-    )
     # parser.add_argument(
     #     "--lrf",
     #     type=float,
