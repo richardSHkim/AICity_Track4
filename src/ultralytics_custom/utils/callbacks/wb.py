@@ -190,56 +190,59 @@ def on_fit_epoch_end(trainer):
         )
 
     # f1
-    # load json file
-    coco_gt = COCO(trainer.data["val_json"])
-    # update image id to filename
-    for img_dict in coco_gt.loadImgs(coco_gt.getImgIds()):
-        stem = Path(img_dict["file_name"]).stem
-        image_id = int(stem) if stem.isnumeric() else stem
-        for ann_dict in coco_gt.loadAnns(coco_gt.getAnnIds([img_dict["id"]])):
-            ann_dict["image_id"] = image_id
-        img_dict["id"] = image_id
-    coco_gt.createIndex()
+    if "val_json" in trainer.data:
+        # load json file
+        coco_gt = COCO(trainer.data["val_json"])
+        # update image id to filename
+        for img_dict in coco_gt.loadImgs(coco_gt.getImgIds()):
+            stem = Path(img_dict["file_name"]).stem
+            image_id = int(stem) if stem.isnumeric() else stem
+            for ann_dict in coco_gt.loadAnns(coco_gt.getAnnIds([img_dict["id"]])):
+                ann_dict["image_id"] = image_id
+            img_dict["id"] = image_id
+        coco_gt.createIndex()
 
-    # get optimal score treshold
-    f1_metrics = {}
-    conf_ticks = trainer.validator.metrics.curves_results[1][0]
-    f1 = trainer.validator.metrics.curves_results[1][1]
-    conf_indices = np.argmax(f1, axis=1)
-    opt_conf_thresh_dict = {}
-    for i, c in enumerate(trainer.validator.metrics.ap_class_index):
-        opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
-            conf_ticks[conf_indices[i]]
-        )
-        opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
-            conf_ticks[conf_indices[i]]
-        )
-        f1_metrics[f"class_metrics_F1_50/{trainer.validator.names[c]}"] = float(
-            f1[i][conf_indices[i]]
-        )
+        # get optimal score treshold
+        f1_metrics = {}
+        conf_ticks = trainer.validator.metrics.curves_results[1][0]
+        f1 = trainer.validator.metrics.curves_results[1][1]
+        conf_indices = np.argmax(f1, axis=1)
+        opt_conf_thresh_dict = {}
+        for i, c in enumerate(trainer.validator.metrics.ap_class_index):
+            opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
+                conf_ticks[conf_indices[i]]
+            )
+            opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
+                conf_ticks[conf_indices[i]]
+            )
+            f1_metrics[f"class_metrics_F1_50/{trainer.validator.names[c]}"] = float(
+                f1[i][conf_indices[i]]
+            )
 
-    # fileter predictions
-    predictions_coco = []
-    for pred in trainer.validator.jdict:
-        # fix category id (starts from 0)
-        pred["category_id"] -= 1
+        # fileter predictions
+        predictions_coco = []
+        for pred in trainer.validator.jdict:
+            # fix category id (starts from 0)
+            pred["category_id"] -= 1
 
-        # thresholding with score
-        if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
-            continue
+            # thresholding with score
+            if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
+                continue
 
-        predictions_coco.append(pred)
-    coco_dt = coco_gt.loadRes(predictions_coco)
+            predictions_coco.append(pred)
+        coco_dt = coco_gt.loadRes(predictions_coco)
 
-    # Initialize evaluation object
-    coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
+        # Initialize evaluation object
+        coco_eval = COCOeval(coco_gt, coco_dt, "bbox")
 
-    # Run evaluation
-    coco_eval.evaluate()
-    coco_eval.accumulate()
-    coco_eval.summarize()
-    f1_metrics["metrics/F1_50-95"] = float(coco_eval.stats[20])
-    f1_metrics["metrics/F1_50"] = float(coco_eval.stats[21])
+        # Run evaluation
+        coco_eval.evaluate()
+        coco_eval.accumulate()
+        coco_eval.summarize()
+        f1_metrics["metrics/F1_50-95"] = float(coco_eval.stats[20])
+        f1_metrics["metrics/F1_50"] = float(coco_eval.stats[21])
+    else:
+        f1_metrics = {}
 
     metrics_to_log = {
         **class_wise_metrics,
