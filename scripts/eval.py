@@ -45,20 +45,16 @@ def main(model_path: str, data_yaml: str, save_json: Optional[str] = None):
     conf_indices = np.argmax(f1, axis=1)
     opt_conf_thresh_dict = {}
     for i in range(len(conf_indices)):
-        opt_conf_thresh_dict[coco_gt.dataset["categories"][i]["id"]] = float(
+        opt_conf_thresh_dict[coco_gt.dataset["categories"][metrics.box.ap_class_index[i]]["id"]] = float(
             conf_ticks[conf_indices[i]]
         )
 
     # filter predictions
     predictions_coco = []
     for pred in validator.jdict:
-        # fix category id
-        pred["category_id"] = coco_gt.dataset["categories"][pred["category_id"] - 1][
-            "id"
-        ]
-
         # thresholding with score
-        if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
+        # if no conf threshold value is provided, remove prediction for the class
+        if pred["score"] < opt_conf_thresh_dict.get(pred["category_id"], 1.0):
             continue
 
         predictions_coco.append(pred)
