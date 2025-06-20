@@ -208,7 +208,10 @@ def on_fit_epoch_end(trainer):
     conf_indices = np.argmax(f1, axis=1)
     opt_conf_thresh_dict = {}
     for i, c in enumerate(trainer.validator.metrics.ap_class_index):
-        opt_conf_thresh_dict[coco_gt.dataset["categories"][i]["id"]] = float(
+        opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
+            conf_ticks[conf_indices[i]]
+        )
+        opt_conf_thresh_dict[coco_gt.dataset["categories"][c]["id"]] = float(
             conf_ticks[conf_indices[i]]
         )
         f1_metrics[f"class_metrics_F1_50/{trainer.validator.names[c]}"] = float(
@@ -218,10 +221,8 @@ def on_fit_epoch_end(trainer):
     # fileter predictions
     predictions_coco = []
     for pred in trainer.validator.jdict:
-        # fix category id
-        pred["category_id"] = coco_gt.dataset["categories"][pred["category_id"] - 1][
-            "id"
-        ]
+        # fix category id (starts from 0)
+        pred["category_id"] -= 1
 
         # thresholding with score
         if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
