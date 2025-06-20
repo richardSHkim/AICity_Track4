@@ -17,6 +17,8 @@ def main(args):
         name=args.run_name,
         data=args.yaml_file,
         # epochs=args.epochs,
+        optimizer=args.optimizer,
+        lr0=args.lr,
         imgsz=640,
         device=args.device,
         seed=args.seed,
@@ -66,16 +68,27 @@ if __name__ == "__main__":
         type=str,
         required=True,
     )
-    parser.add_argument(
-        "--epochs",
-        type=int,
-        default=200,
-    )
     # parser.add_argument(
-    #     "--lr",
-    #     type=float,
-    #     default=0.001,
+    #     "--epochs",
+    #     type=int,
+    #     default=200,
     # )
+    parser.add_argument(
+        "--optimizer",
+        type=str,
+        default="adamw",
+        choices=["sgd", "adamw"],
+    )
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=0.001,
+    )
+    parser.add_argument(
+        "--momentum",
+        type=float,
+        default=0.9,
+    )
     # parser.add_argument(
     #     "--lrf",
     #     type=float,
