@@ -17,8 +17,8 @@ def main(args):
         name=args.run_name,
         data=args.yaml_file,
         # epochs=args.epochs,
-        optimizer=args.optimizer,
-        lr0=args.lr,
+        # optimizer=args.optimizer,
+        # lr0=args.lr,
         imgsz=640,
         device=args.device,
         seed=args.seed,
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--lr",
         type=float,
-        default=0.001,
+        default=0.001111,
     )
     parser.add_argument(
         "--momentum",
