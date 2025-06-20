@@ -222,9 +222,6 @@ def on_fit_epoch_end(trainer):
         # fileter predictions
         predictions_coco = []
         for pred in trainer.validator.jdict:
-            # fix category id (starts from 0)
-            pred["category_id"] -= 1
-
             # thresholding with score
             if pred["score"] < opt_conf_thresh_dict[pred["category_id"]]:
                 continue
